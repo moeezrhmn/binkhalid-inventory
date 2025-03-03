@@ -18,6 +18,7 @@
 
     @endif
 
+    <script src="{{ asset('assets/js/jquery.min.js') }}" ></script>
 
     @yield('header-scripts')
 </head>
