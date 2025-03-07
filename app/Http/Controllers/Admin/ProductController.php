@@ -39,6 +39,7 @@ class ProductController extends Controller
 
         return view('admin.product.index');
     }
+ 
     public function create()
     {
         return view('admin.product.create');
@@ -52,8 +53,6 @@ class ProductController extends Controller
             $validated = $request->validate([
                 'name' => 'required',
                 'sku' => 'required|string|unique:products,sku',
-                'color' => 'nullable',
-                'size' => 'nullable',
                 'price' => 'required|numeric',
                 'description' => 'nullable',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -90,8 +89,6 @@ class ProductController extends Controller
                 'max:100',
                 Rule::unique('products', 'sku')->ignore($product->sku, 'sku')
             ],
-            'color' => 'nullable|string|max:100',
-            'size' => 'nullable|string|max:100',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
