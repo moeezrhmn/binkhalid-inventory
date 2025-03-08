@@ -22,17 +22,18 @@ class OrderController extends Controller
                 ->addColumn('order_no', function ($order) {
                     return $order->order_no;
                 })
-                ->addColumn('customer_name', function ($order) {
-                    return $order->customer_name;
-                })
-                ->addColumn('customer_email', function ($order) {
-                    return $order->customer_email;
-                })
-                ->addColumn('customer_phone', function ($order) {
-                    return $order->customer_phone;
+                ->addColumn('customer', function ($order) {
+                    return "
+                        <div> $order->customer_name </div>
+                        <div> $order->customer_email </div>
+                        <div> $order->customer_phone </div>
+                    ";
                 })
                 ->addColumn('shipping_address', function ($order) {
                     return $order->shipping_address;
+                })
+                ->addColumn('description', function ($order) {
+                    return $order->description;
                 })
                 ->addColumn('subtotal', function ($order) {
                     return $order->subtotal;
@@ -89,14 +90,17 @@ class OrderController extends Controller
                 ->addColumn('action', function ($order) {
                     return '
                         <div class="flex space-x-2">
-                            <a href="' . route('admin.order.delete', $order->id) . '" class="px-3 py-1 text-xs" style="color: #EF4444; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></a>
-                            <a href="#" data-id="' . $order->id . '" class="view-order px-0 py-1 text-xs" style="color: green; font-size: 12px;">
+                            <a href="' . route('admin.order.delete', $order->id) . '" 
+                            onclick="return confirm(\'Are you sure you want to delete this order?\')"
+                             class="px-3 py-1 text-xs" style="color: #EF4444; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></a>
+                            
+                            <a href="#" data-id="' . $order->id . '" class="view-order px-0 py-1 text-xs" style="color: green; font-size: 12px; display:none; ">
                                 <i class="fa-regular fa-eye"></i>
                             </a>
                         </div>
                     ';
                 })
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['customer','status', 'action'])
                 ->make(true);
         }
 
@@ -137,7 +141,7 @@ class OrderController extends Controller
         return view('admin.order.create', compact("products"));
     }
     public function store(Request $request){
-        dd($request);
+        // dd($request);
         $request->validate([
             'customer_name' => 'required',
             'customer_email' => 'required',

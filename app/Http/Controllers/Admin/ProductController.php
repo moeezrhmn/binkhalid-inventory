@@ -24,7 +24,7 @@ class ProductController extends Controller
                     return '<img src="' . ($product->image ? asset($product->image) : 'https://placehold.co/400') . '" alt="' . $product->name . '" class="h-20 w-20 rounded object-cover">';
                 })
                 ->addColumn('price', function ($product) {
-                    return '$' . number_format($product->price, 2);
+                    return 'Rs' . number_format($product->price, 2);
                 })
                 ->addColumn('action', function ($product) {
                     return '
