@@ -39,3 +39,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/delete/{id}', 'delete')->name('delete');
     });
 });
+
+Route::get('/admin/orders/{id}/items', [OrderController::class, 'getOrderItems']);

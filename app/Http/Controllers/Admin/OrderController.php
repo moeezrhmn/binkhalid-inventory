@@ -65,22 +65,22 @@ class OrderController extends Controller
                         </select>
                     </form>
                 <script>
-    $(document).ready(function () {
-        $(".status_badge").hover(function () {
-            $(this).hide();
-            $(this).siblings(".status_select").removeClass("hidden").focus();
-        });
+                $(document).ready(function () {
+                    $(".status_badge").hover(function () {
+                        $(this).hide();
+                        $(this).siblings(".status_select").removeClass("hidden").focus();
+                    });
 
-        $(".status_select").on("mouseleave", function () {
-            $(this).addClass("hidden");
-            $(this).siblings(".status_badge").show();
-        });
+                    $(".status_select").on("mouseleave", function () {
+                        $(this).addClass("hidden");
+                        $(this).siblings(".status_badge").show();
+                    });
 
-        $(".status_select").change(function () {
-            $(this).closest("form").submit();
-        });
-    });
-</script>
+                    $(".status_select").change(function () {
+                        $(this).closest("form").submit();
+                    });
+                });
+            </script>
                     
                     ';
                 })
@@ -90,6 +90,9 @@ class OrderController extends Controller
                     return '
                         <div class="flex space-x-2">
                             <a href="' . route('admin.order.delete', $order->id) . '" class="px-3 py-1 text-xs" style="color: #EF4444; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></a>
+                            <a href="#" data-id="' . $order->id . '" class="view-order px-0 py-1 text-xs" style="color: green; font-size: 12px;">
+                                <i class="fa-regular fa-eye"></i>
+                            </a>
                         </div>
                     ';
                 })
@@ -99,6 +102,17 @@ class OrderController extends Controller
 
         return view('admin.order.index');
     }
+    public function getOrderItems($id)
+    {
+        $order = Order::with('orderItems')->find($id);
+        
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        return response()->json(['order_items' => $order->orderItems]);
+    }
+
     public function getStatusColor($status){
         $colors = [
             "pending" => "#3B82F6",
@@ -123,7 +137,7 @@ class OrderController extends Controller
         return view('admin.order.create', compact("products"));
     }
     public function store(Request $request){
-        // dd($request);
+        dd($request);
         $request->validate([
             'customer_name' => 'required',
             'customer_email' => 'required',
@@ -153,6 +167,7 @@ class OrderController extends Controller
             $order_item->product_id = $item['id'];
             $order_item->quantity = $item['quantity'];
             $order_item->price = $item['price'];
+            $order_item->description = $item['description'];
             $order_item->save();
         }
         return redirect()->route('admin.order.create')->with('message', 'Order Created Successfully!');

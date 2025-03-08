@@ -1,7 +1,12 @@
 @extends('layouts.app')
 @section('header-scripts')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
-
+<style>
+    .item-subtotal:active{
+        border: 0;
+        outline: 0;
+    }
+</style>
 @endsection
 @section('content')
 
@@ -111,9 +116,11 @@
                         <tr>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancel</th>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Information</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">price</th>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -122,7 +129,7 @@
                 </table>
                 <div class="flex flex-col justify-end align-bottom ml-auto" style="width: 100px; margin-left: auto; align-items: flex-end;">
                     <h2 class="text-base/4 mt-6 font-semibold text-black">Total <span class="text-red-600">*</span></h2>
-                    <input type="text" required id="grand-total" name="total" class="text-2">
+                    <input type="text" readonly required id="grand-total" name="total" class="text-2">
                 </div>
             </div>
         </div>
@@ -146,7 +153,7 @@
 
 @endsection
 @section('footer-scripts')
-<script>
+{{-- <script>
     const dropArea = document.getElementById("drop-area");
     const fileInput = document.getElementById("file-input");
 
@@ -199,7 +206,7 @@
             $("form").append(fileInput);
         }
     }
-</script>
+</script> --}}
 
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
 <script src="{{asset('assets/js/select2.min.js')}}"></script>
@@ -254,7 +261,6 @@
 
        
 
-        console.log(id);
 
         
 
@@ -272,9 +278,11 @@
                 </td>
                 
                 
-                <td><input type="number" name="items[${orderIndex}][quantity] class="border-0 outline-0 item-quantity" value="1" min="1" style="width: 100px;"></td>
-                <td>
-                    <input type="text" class="border-0 outline-0 item-price" name="items[${orderIndex}][price] style="width: 100px;" value="${price}">
+                <td><input type="number" name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
+                <td><input type="number" name="items[${orderIndex}][quantity]" class="border-0 outline-0 item-quantity" value="1" min="1" style="width: 70px;"></td>
+                <td style="width: 200px;"><textarea name="items[${orderIndex}][description]" class="border-0 outline-0 item-description" rows="3" style="border: 1px solid #71797E;"></textarea></td>
+                <td style="width: 60px;">
+                    <input type="text" class="item-subtotal" readonly name="items[${orderIndex}][subtotal]" value="${price}" style="width: 90px; display: block; margin: auto; border: 0;">
                 </td>
                 <input type="hidden" name="items[${orderIndex}][id]" value="${id}">
             </tr>
@@ -282,31 +290,40 @@
         orderIndex += 1;
         updateTotal();
     });
-    $(document).on('input', '.item-quantity', function() {
-        let quantity = parseInt($(this).val()); // Get new quantity
-        let price = {{$product->price}}; // Get base price
+    $(document).on('input', '.item-quantity, .item-price', function() {
+        let row = $(this).closest('tr');
+        let price = parseFloat(row.find('.item-price').val()) || 0;
+        let quantity = parseInt(row.find('.item-quantity').val()) || 1;
 
+        let newSubTotal = (price * quantity).toFixed(2);
+        row.find('.item-subtotal').val(""); // Update subtotal
+        row.find('.item-subtotal').val(newSubTotal); // Update subtotal
+
+        updateTotal(); // Recalculate grand total
+    });
+
+        let price = parseInt($(this).val()); // Get new quantity
+        let quantity = $(this).closest('tr').find('.item-quantity').val(); // Get base price
+        console.log(price);
+        console.log(quantity);
         if (quantity < 1 || isNaN(quantity)) {
             quantity = 1; // Ensure quantity is at least 1
-            $(this).val(1);
+            quantity.val(1);
         }
 
-        let newTotal = (price * quantity).toFixed(2); // Calculate new total
-        $(this).closest('tr').find('.item-price').val(`${newTotal}`); // Update price display
+        let newSubTotal = (price * quantity).toFixed(2); // Calculate new total
+        $(this).closest('tr').find('.item-subtotal').val(`${newSubTotal}`); // Update price display
         updateTotal();
-    });
+    
     // calculating the total
-    function updateTotal() {
+        function updateTotal() {
             let total = 0;
-            $('.item-price').each(function() {
-                total += parseFloat($(this).val().replace('Rs', '')) || 0;
+            $('.item-subtotal').each(function() {
+                total += parseFloat($(this).val()) || 0;
             });
-            $('#grand-total').val(`${total.toFixed(2)}`);
+            $('#grand-total').val(total.toFixed(2));
         }
-        updateTotal();
-    $(document).on('input', '.item-price', function() {
-        updateTotal();
-    });
+
 
     // Remove row when clicking the cancel button
     $(document).on('click', '.remove-btn', function() {
@@ -315,7 +332,7 @@
     });
 
 });
-
+// 
     
 
 </script>
