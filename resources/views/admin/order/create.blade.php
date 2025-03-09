@@ -60,9 +60,9 @@
                     
     
                     <div class="sm:col-span-3">
-                        <label for="customer_email" class="block text-sm/6 font-medium text-gray-900">Customer Email <span class="text-red-600">*</span></label>
+                        <label for="customer_email" class="block text-sm/6 font-medium text-gray-900">Customer Emai</label>
                         <div class="mt-2">
-                            <input type="text" required name="customer_email" id="customer_email" value="{{ old('customer_email') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
+                            <input type="text" name="customer_email" id="customer_email" value="{{ old('customer_email') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
                         </div>
                     </div>
     
@@ -88,8 +88,8 @@
                     </div>
                     
                     <div class="sm:col-span-3">
-                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description <span class="text-red-600">*</span></label>
-                        <textarea id="description" required name="description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ isset($order) ? $order->description : old('description') }}</textarea>
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                        <textarea id="description" name="description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ isset($order) ? $order->description : old('description') }}</textarea>
                     </div>
     
     
@@ -114,13 +114,15 @@
                 <table id="items-table" class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cancel</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">price</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Cancel</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Image</th>
+                            <th  class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Details</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">price</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Color</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Size</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Quantity</th>
+                            <th class="px-3 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase ">Description</th>
+                            <th class="px-3 py-2 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase ">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -136,7 +138,7 @@
 
         <select id="product-dropdown" class="w-full">
             @foreach($products as $product)
-            <option class="outer-main" data-id="{{$product->id}}" data-quantity="{{$product->quantity}}" data-price="{{$product->price}}" data-image="{{asset($product->image)}}" data-sku="{{$product->sku}}" data-desc="{{$product->description}}">{{$product->name}}</option>
+            <option class="outer-main" data-id="{{$product->id}}" data-quantity="{{$product->quantity}}" data-price="{{$product->price}}" data-image="{{asset($product->image)}}" data-sku="{{$product->sku}}" data-colors="{{  $product->color }}" data-sizes="{{ $product->size }}" data-desc="{{$product->description}}">{{$product->name}}</option>
             @endforeach
             
         </select>
@@ -153,62 +155,7 @@
 
 @endsection
 @section('footer-scripts')
-{{-- <script>
-    const dropArea = document.getElementById("drop-area");
-    const fileInput = document.getElementById("file-input");
 
-    // Open file selector when clicking the drag area
-    dropArea.addEventListener("click", () => {
-        // fileInput.click();
-    });
-
-    // Handle file selection
-    fileInput.addEventListener("change", handleFiles);
-
-    dropArea.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropArea.classList.add("border-blue-500");
-    });
-
-    dropArea.addEventListener("dragleave", () => {
-        dropArea.classList.remove("border-blue-500");
-    });
-
-    dropArea.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropArea.classList.remove("border-blue-500");
-        fileInput.files = e.dataTransfer.files;
-        handleFiles({
-            target: {
-                files: e.dataTransfer.files
-            }
-        });
-    });
-
-    function handleFiles(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                dropArea.style.backgroundImage = `url(${reader.result})`;
-                dropArea.style.backgroundSize = "cover";
-                dropArea.style.backgroundPosition = "center";
-                // Hide the text and icon when an image is displayed
-                dropArea.innerHTML = "";
-            };
-            reader.readAsDataURL(file);
-
-            let fileInput = $("<input>")
-                .attr("type", "file")
-                .attr("name", "image")
-                .prop("files", event.target.files) 
-                .css("display", "none");
-            $("form").append(fileInput);
-        }
-    }
-</script> --}}
-
-<script src="{{asset('assets/js/jquery.min.js')}}"></script>
 <script src="{{asset('assets/js/select2.min.js')}}"></script>
 
 
@@ -225,21 +172,25 @@
         if (!product.id) {
             return product.text;
         }
-
+        console.log(product.element)
         let image = $(product.element).data('image');
         let sku = $(product.element).data('sku');
         let desc = $(product.element).data('desc');
         let id = $(product.element).data('id');
         let price = $(product.element).data('price');
+        let colors = $(product.element).data('colors');
+        let sizes = $(product.element).data('sizes');
         let quantity = 1;
-        
+        colors = colors.split(',');
+        sizes = sizes.split(',');
         return $(`
             <div class="flex items-center bg-white-100 p-2 space-x-3 select-item-option-inner">
                 <img src="${image}" class="w-10 h-10 object-cover select-item-option-image rounded">
-                <div>
-                    <span class="text-gray-500 text-xs">${sku}</span><br>
-                    <span class="font-semibold focus:text-black-900">${product.text}</span><br>
-                    <span class="text-sm text-gray-600">${desc}</span>
+                <div class='flex flex-col' >
+                    <small class="text-gray-500 ">${sku}</small>
+                    <div class="font-semibold focus:text-black-900">${product.text}</div>
+                    <small class="text-gray-600"> <b> colors: </b> ${colors} <b> sizes: </b> ${sizes} </small>
+                    <small class="text-gray-600">${desc} </small>
                 </div>
             </div>
         `);
@@ -256,19 +207,22 @@
         let sku = $(selectedData.element).data('sku');
         let desc = $(selectedData.element).data('desc');
         let price = $(selectedData.element).data('price');
+        let colors = $(selectedData.element).data('colors');
+        let sizes = $(selectedData.element).data('sizes');
         let id = $(selectedData.element).data('id');
         let quantity = 1;
 
        
 
-
+        colors = colors.split(',');
+        sizes = sizes.split(',');
         
 
         // Append selected product to the table
         $('#items-table tbody').append(`
             <tr>
                 <td class="px-6 py-3">
-                    <button class="remove-btn px-3 py-1 rounded hover:bg-red-700">X</button>
+                    <button type='button' class="remove-btn px-3 py-1 rounded hover:bg-red-700">X</button>
                 </td>
                 <td><img src="${image}" class="w-10 h-10 rounded"></td>
                 <td>
@@ -278,9 +232,32 @@
                 </td>
                 
                 
-                <td><input type="number" name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
+                <td><input type="number" min='1' name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
+
+                <td>
+                    <select name='items[${orderIndex}][color]' > 
+                    ${
+                        colors.map(color => {
+                            return `<option value="${color}">${color}</option>`;
+                        })
+                    }
+                    </select>
+                </td>
+
+                <td>
+                    <select name='items[${orderIndex}][size]' > 
+                    ${
+                        sizes.map(size => {
+                            return `<option value="${size}">${size}</option>`;
+                        })
+                    }
+                    </select>
+                </td>
+
                 <td><input type="number" name="items[${orderIndex}][quantity]" class="border-0 outline-0 item-quantity" value="1" min="1" style="width: 70px;"></td>
-                <td style="width: 200px;"><textarea name="items[${orderIndex}][description]" class="border-0 outline-0 item-description" rows="3" style="border: 1px solid #71797E;"></textarea></td>
+                <td style="width: 200px;">
+                <textarea name="items[${orderIndex}][description]" class="border-0 outline-0 item-description" rows="3" cols='5' style="border: 1px solid #71797E;"></textarea>
+                </td>
                 <td style="width: 60px;">
                     <input type="text" class="item-subtotal" readonly name="items[${orderIndex}][subtotal]" value="${price}" style="width: 90px; display: block; margin: auto; border: 0;">
                 </td>
@@ -302,18 +279,18 @@
         updateTotal(); // Recalculate grand total
     });
 
-        let price = parseInt($(this).val()); // Get new quantity
-        let quantity = $(this).closest('tr').find('.item-quantity').val(); // Get base price
-        console.log(price);
-        console.log(quantity);
-        if (quantity < 1 || isNaN(quantity)) {
-            quantity = 1; // Ensure quantity is at least 1
-            quantity.val(1);
-        }
+        // let price = parseInt($(this).val()); // Get new quantity
+        // let quantity = $(this).closest('tr').find('.item-quantity').val(); // Get base price
+        // console.log(price);
+        // console.log(quantity);
+        // if (quantity < 1 || isNaN(quantity)) {
+        //     quantity = 1; // Ensure quantity is at least 1
+        //     quantity.val(1);
+        // }
 
-        let newSubTotal = (price * quantity).toFixed(2); // Calculate new total
-        $(this).closest('tr').find('.item-subtotal').val(`${newSubTotal}`); // Update price display
-        updateTotal();
+        // let newSubTotal = (price * quantity).toFixed(2); // Calculate new total
+        // $(this).closest('tr').find('.item-subtotal').val(`${newSubTotal}`); // Update price display
+        // updateTotal();
     
     // calculating the total
         function updateTotal() {

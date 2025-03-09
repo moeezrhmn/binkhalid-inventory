@@ -3,7 +3,6 @@
 
 @section('header-scripts')
 
-<script src="{{asset('assets/js/jquery.min.js')}}"></script>
 <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 

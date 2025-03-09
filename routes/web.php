@@ -34,6 +34,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/store', 'store')->name('store');
         Route::put('/status/update/{id}', 'status_update')->name('status.update');
 
+        Route::get('/ordered-items', 'ordered_items')->name('ordered_items');
+
         // Route::get('/edit/{id}', 'edit')->name('edit');
         // Route::put('/update/{id}', 'update')->name('update');
         Route::get('/delete/{id}', 'delete')->name('delete');

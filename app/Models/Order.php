@@ -12,6 +12,17 @@ class Order extends Model
     public const STATUS_DELIVERED = 'delivered';
     public const STATUS_CANCELLED = 'cancelled';
 
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_PENDING => 'Pending',
+            self::STATUS_PROCESSING => 'Processing',
+            self::STATUS_COMPLETED => 'Completed',
+            self::STATUS_DELIVERED => 'Delivered',
+            self::STATUS_CANCELLED => 'Cancelled',
+        ];
+    }
+
     protected $fillable = [
         'order_no',
         'customer_name',

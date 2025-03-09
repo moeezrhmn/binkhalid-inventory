@@ -54,6 +54,8 @@ class ProductController extends Controller
                 'name' => 'required',
                 'sku' => 'required|string|unique:products,sku',
                 'price' => 'required|numeric',
+                'color' => 'required',
+                'size' => 'required',
                 'description' => 'nullable',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             ]);

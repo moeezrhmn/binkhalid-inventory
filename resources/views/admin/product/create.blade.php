@@ -17,20 +17,20 @@
 @endif
 
 @if ($errors->any())
-    <div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+<div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
     <svg class="shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
     </svg>
     <span class="sr-only">Danger</span>
     <div>
         <span class="font-medium">Validation errors:</span>
         <ul class="mt-1.5 list-disc list-inside">
             @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
             @endforeach
         </ul>
     </div>
-    </div>
+</div>
 @endif
 
 <form action="{{ isset($product) ? route('admin.product.update', $product->id) : route('admin.product.store') }}" method="post" enctype="multipart/form-data">
@@ -57,12 +57,24 @@
                     </div>
                 </div>
 
-                
+
 
                 <div class="sm:col-span-3">
                     <label for="price" class="block text-sm/6 font-medium text-gray-900">Price</label>
                     <div class="mt-2">
                         <input type="text" name="price" id="price" placeholder="Rs 200" value="{{ isset($product) ? $product->price : old('price') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
+                    </div>
+                </div>
+                <div class="sm:col-span-3">
+                    <label for="color" class="block text-sm/6 font-medium text-gray-900">color</label>
+                    <div class="mt-2">
+                        <input type="text" name="color" id="color" value="{{ isset($product) ? $product->color : old('color') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
+                    </div>
+                </div>
+                <div class="sm:col-span-3">
+                    <label for="size" class="block text-sm/6 font-medium text-gray-900">size</label>
+                    <div class="mt-2">
+                        <input type="text" name="size" id="size" value="{{ isset($product) ? $product->size : old('size') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
                     </div>
                 </div>
 
@@ -101,7 +113,13 @@
 
 @endsection
 @section('footer-scripts')
+<script src="{{ asset('assets/js/tagsInput.js') }}"></script>
 <script>
+    $(document).ready(function() {
+
+        new TagInput('color');
+        new TagInput('size');
+    });
     const dropArea = document.getElementById("drop-area");
     const fileInput = document.getElementById("file-input");
 
@@ -149,10 +167,11 @@
             let fileInput = $("<input>")
                 .attr("type", "file")
                 .attr("name", "image")
-                .prop("files", event.target.files) 
+                .prop("files", event.target.files)
                 .css("display", "none");
             $("form").append(fileInput);
         }
     }
+
 </script>
 @endsection

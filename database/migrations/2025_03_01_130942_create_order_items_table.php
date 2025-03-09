@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('product_id')->references('id')->on('products')->constrained('products')->onDelete('cascade');
             $table->integer('quantity');
             $table->float('price');
-            $table->boolean('is_created')->default(false);
             $table->timestamps();
         });
     }

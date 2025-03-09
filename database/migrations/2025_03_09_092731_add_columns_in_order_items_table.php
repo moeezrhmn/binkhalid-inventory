@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->after('price', function($table){
-                $table->text('description');
+            $table->after('price', function () use ($table) {
+                $table->string('color')->nullable();
+                $table->string('size')->nullable();
+                $table->boolean('is_created')->default(false);
             });
         });
     }
@@ -24,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('order_items', function (Blueprint $table) {
-            $table->dropColumn('description');
+            $table->dropColumn(['color', 'size', 'is_created']);
         });
     }
 };

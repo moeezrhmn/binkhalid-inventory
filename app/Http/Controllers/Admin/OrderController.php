@@ -43,7 +43,7 @@ class OrderController extends Controller
                 })
                 ->addColumn('status', function ($order) {
                     return '
-                    <form action="' . route('admin.order.status.update', ['id'=>$order->id]) . '" 
+                    <form action="' . route('admin.order.status.update', ['id' => $order->id]) . '" 
                           method="POST" 
                           class="status-form inline-block relative">
                         ' . csrf_field() . '
@@ -85,8 +85,8 @@ class OrderController extends Controller
                     
                     ';
                 })
-                
-                
+
+
                 ->addColumn('action', function ($order) {
                     return '
                         <div class="flex space-x-2">
@@ -100,7 +100,7 @@ class OrderController extends Controller
                         </div>
                     ';
                 })
-                ->rawColumns(['customer','status', 'action'])
+                ->rawColumns(['customer', 'status', 'action'])
                 ->make(true);
         }
 
@@ -109,7 +109,7 @@ class OrderController extends Controller
     public function getOrderItems($id)
     {
         $order = Order::with('orderItems')->find($id);
-        
+
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
@@ -117,7 +117,8 @@ class OrderController extends Controller
         return response()->json(['order_items' => $order->orderItems]);
     }
 
-    public function getStatusColor($status){
+    public function getStatusColor($status)
+    {
         $colors = [
             "pending" => "#3B82F6",
             "processing" => "#6B7280",
@@ -127,7 +128,8 @@ class OrderController extends Controller
         ];
         return $colors[$status] ?? "#000";
     }
-    public function status_update(Request $request, $id){
+    public function status_update(Request $request, $id)
+    {
         // dd($id);
         $order = Order::find($id);
         $order->status = $request->status;
@@ -140,13 +142,14 @@ class OrderController extends Controller
         $products = Product::get();
         return view('admin.order.create', compact("products"));
     }
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // dd($request);
         $request->validate([
             'customer_name' => 'required',
-            'customer_email' => 'required',
+            'customer_email' => 'nullable',
             'customer_phone' => 'required',
-            'description' => 'required',
+            'description' => 'nullable',
             'status' => 'required|in:pending,processing,completed,delivered,cancelled',
             'shipping_address' => 'required',
             'total' => 'required|numeric'
@@ -164,22 +167,68 @@ class OrderController extends Controller
 
         $insertedOrderId = $order->id;
 
-        
+
         foreach ($request->items as $item) {
             $order_item = new OrderItem();
             $order_item->order_id = $insertedOrderId;
             $order_item->product_id = $item['id'];
             $order_item->quantity = $item['quantity'];
             $order_item->price = $item['price'];
+            $order_item->color = $item['color'];
+            $order_item->size = $item['size'];
             $order_item->description = $item['description'];
             $order_item->save();
         }
         return redirect()->route('admin.order.create')->with('message', 'Order Created Successfully!');
     }
-    public function delete($id){
+    public function delete($id)
+    {
         Order::where('id', $id)->delete();
         OrderItem::where('order_id', $id)->delete();
         return redirect()->route('admin.order.index');
     }
 
+    public function ordered_items(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $query = OrderItem::with(['order', 'product'])
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->whereHas('order', function ($q) use ($request) {
+                    $q->where('status', $request->status);
+                });
+            })
+            ->when($request->filled('product_id'), function ($query) use ($request) {
+                $query->where('product_id', $request->product_id);
+            })
+            ->when($request->filled('color'), function ($query) use ($request) {
+                $query->where('color', $request->color);
+            })
+            ->when($request->filled('date_from') && $request->filled('date_to'), function ($query) use ($request) {
+                $query->whereHas('order', function ($q) use ($request) {
+                    $q->whereBetween('created_at', [$request->date_from, $request->date_to]);
+                });
+            });
+        
+            return DataTables::of($query)
+                ->addColumn('order_no', function ($row) {
+                    return $row->order->order_no ?? 'N/A';
+                })
+                ->addColumn('customer_name', function ($row) {
+                    return $row->order->customer_name ?? 'N/A';
+                })
+                ->addColumn('status', function ($row) {
+                    return $row->order->status ?? 'N/A';
+                })
+                ->addColumn('product_name', function ($row) {
+                    return $row->product->name ?? 'N/A';
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->order->created_at->format('Y-m-d');
+                })
+                ->make(true);
+        }
+        $products = Product::get();
+        return view('admin.ordered_items.index', compact('products'));
+    }
 }
