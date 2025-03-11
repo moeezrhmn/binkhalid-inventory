@@ -61,7 +61,7 @@ class ProductController extends Controller
             ]);
 
             if ($request->hasFile('image')) {
-                $imageName = $validated['sku'] . '_' . Str::random(7) . '.' . $request->file('image')->extension();
+                $imageName =  Str::random(17) . '.' . $request->file('image')->extension();
                 $path = $request->file('image')->storeAs('products', $imageName, 'public');
                 $validated['image'] = 'storage/' . $path;
             }
@@ -102,7 +102,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
 
-            $imageName = $validated['sku'] . '_' . Str::random(7) . '.' . $request->file('image')->extension();
+            $imageName =  Str::random(17) . '.' . $request->file('image')->extension();
             $path = $request->file('image')->storeAs('products', $imageName, 'public');
             $validated['image'] = 'storage/' . $path;
         }
