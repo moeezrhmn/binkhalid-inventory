@@ -137,6 +137,7 @@
         </div>
 
         <select id="product-dropdown" class="w-full">
+            <option value="">--select product --</option>
             @foreach($products as $product)
             <option class="outer-main" data-id="{{$product->id}}" data-quantity="{{$product->quantity}}" data-price="{{$product->price}}" data-image="{{asset($product->image)}}" data-sku="{{$product->sku}}" data-colors="{{  $product->color }}" data-sizes="{{ $product->size }}" data-desc="{{$product->description}}">{{$product->name}}</option>
             @endforeach
@@ -197,7 +198,7 @@
     }
 
     function formatProductSelection(product) {
-        return product.text;
+        return  `${product.text}`;
     }
 
     // Listen for Select2 option selection
@@ -266,6 +267,8 @@
         `);
         orderIndex += 1;
         updateTotal();
+        $(this).val(null).trigger('change');
+
     });
     $(document).on('input', '.item-quantity, .item-price', function() {
         let row = $(this).closest('tr');
