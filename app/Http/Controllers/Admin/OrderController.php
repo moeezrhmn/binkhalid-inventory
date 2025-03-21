@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -211,6 +212,9 @@ class OrderController extends Controller
             });
         
             return DataTables::of($query)
+                ->addColumn('checkbox', function ($row) {
+                    return '<input type="checkbox" class="checkbox" data-order-item-id="' . $row->id . '">';
+                })
                 ->addColumn('order_no', function ($row) {
                     return $row->order->order_no ?? 'N/A';
                 })
@@ -226,9 +230,34 @@ class OrderController extends Controller
                 ->editColumn('created_at', function ($row) {
                     return $row->order->created_at->format('Y-m-d');
                 })
+                ->orderColumn('checkbox', false)
+                ->rawColumns(['checkbox'])
                 ->make(true);
         }
         $products = Product::get();
         return view('admin.ordered_items.index', compact('products'));
+    }
+
+    public function generateWorkerPdf(Request $request)
+    {
+        $request->validate([
+            'worker_name' => 'required|string',
+            'selected_items' => 'required|string'
+        ]);
+
+        $selectedIds = json_decode($request->selected_items);
+        $workerName = $request->worker_name;
+
+        $orderItems = OrderItem::with(['product', 'order'])
+            ->whereIn('id', $selectedIds)
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.worker_items', [
+            'worker_name' => $workerName,
+            'date' => now()->format('Y-m-d'),
+            'items' => $orderItems
+        ]);
+
+        return $pdf->stream('worker-items-' . now()->format('Y-m-d') . '.pdf');
     }
 }

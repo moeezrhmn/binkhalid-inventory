@@ -43,3 +43,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 Route::get('/admin/orders/{id}/items', [OrderController::class, 'getOrderItems']);
+
+Route::post('/generate-worker-pdf', [OrderController::class, 'generateWorkerPdf'])->name('admin.generate.worker.pdf');
