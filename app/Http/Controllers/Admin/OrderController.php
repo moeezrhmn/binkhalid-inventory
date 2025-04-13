@@ -224,6 +224,9 @@ class OrderController extends Controller
                 ->addColumn('status', function ($row) {
                     return $row->order->status ?? 'N/A';
                 })
+                ->addColumn('assigned', function ($row) {
+                    return empty($row->tags) ? 'N/A' : $row->tags;
+                })
                 ->addColumn('product_name', function ($row) {
                     return $row->product->name ?? 'N/A';
                 })
@@ -251,12 +254,17 @@ class OrderController extends Controller
         $orderItems = OrderItem::with(['product', 'order'])
             ->whereIn('id', $selectedIds)
             ->get();
-
+        foreach ($orderItems as  $order_item) {
+            $order_item->tags = $workerName;
+            $order_item->save();
+        }
+        // dd($orderItems);
         $pdf = Pdf::loadView('admin.pdf.worker_items', [
             'worker_name' => $workerName,
             'date' => now()->format('Y-m-d'),
             'items' => $orderItems
         ]);
+        $pdf->setPaper([0, 0, 450, 600], 'portrait');
 
         return $pdf->stream('worker-items-' . now()->format('Y-m-d') . '.pdf');
     }

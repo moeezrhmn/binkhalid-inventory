@@ -39,8 +39,11 @@ class Order extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 0;
-            $model->order_no = str_pad((int) $lastOrder + 1, 5, '0', STR_PAD_LEFT); // 00001
+            // $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 0;
+            // $model->order_no = str_pad((int) $lastOrder + 1, 5, '0', STR_PAD_LEFT); // 00001
+            $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 5999;
+            $nextOrder = max((int) $lastOrder + 1, 6000); // Ensure at least 6000
+            $model->order_no = str_pad($nextOrder, 5, '0', STR_PAD_LEFT);
         });
 
         static::updating(function ($contract) {
