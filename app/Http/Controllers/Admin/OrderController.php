@@ -264,7 +264,7 @@ class OrderController extends Controller
             'date' => now()->format('Y-m-d'),
             'items' => $orderItems
         ]);
-        $pdf->setPaper([0, 0, 450, 600], 'portrait');
+        // $pdf->setPaper([0, 0, 450, 600], 'portrait');
 
         return $pdf->stream('worker-items-' . now()->format('Y-m-d') . '.pdf');
     }
