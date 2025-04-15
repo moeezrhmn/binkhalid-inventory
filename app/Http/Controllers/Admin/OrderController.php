@@ -262,9 +262,9 @@ class OrderController extends Controller
         $pdf = Pdf::loadView('admin.pdf.worker_items', [
             'worker_name' => $workerName,
             'date' => now()->format('Y-m-d'),
-            'items' => $orderItems
+            'items' => $orderItems,
         ]);
-        // $pdf->setPaper([0, 0, 450, 600], 'portrait');
+        $pdf->setPaper([0, 0, 1500, 842 ], 'landscape');;
 
         return $pdf->stream('worker-items-' . now()->format('Y-m-d') . '.pdf');
     }
