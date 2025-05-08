@@ -51,8 +51,8 @@
             </select>
         </div>
         <div>
-            <label for="product_id" class="block text-sm font-medium text-gray-700">Product</label>
-            <select id="product_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <label for="product_ids" class="block text-sm font-medium text-gray-700">Product</label>
+            <select id="product_ids" multiple class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option value="">All</option>
                 @foreach($products as $product)
                 <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -95,84 +95,124 @@
 
 @section('footer-scripts')
 <script>
+    var ordered_product_ids = []
     $(document).ready(function() {
+
+        let selectedIds = [];
+        let selectAll = false;
+        let totalRecords = 0;
+
         let table = $('#orderedItemsTable').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 200,
+            lengthMenu: [[10, 50, 100, 200, 500, -1], [10, 50, 100, 200, 500, "All"]],
             ajax: {
                 url: "{{ route('admin.order.ordered_items') }}",
                 data: function(d) {
                     d.status = $('#status').val();
-                    d.product_id = $('#product_id').val();
+                    d.product_ids = $('#product_ids').val();
                     d.color = $('#color').val();
                     d.date_from = $('#date_from').val();
                     d.date_to = $('#date_to').val();
                 }
             },
             columns: [
-                {
-                    data: 'checkbox',
-                    name: 'checkbox'
-                },
-                {
-                    data: 'order_no',
-                    name: 'order_no'
-                },
-                {
-                    data: 'customer_name',
-                    name: 'customer_name'
-                },
-                {
-                    data: 'product_name',
-                    name: 'product_name'
-                },
-                {
-                    data: 'quantity',
-                    name: 'quantity'
-                },
-                {
-                    data: 'price',
-                    name: 'price'
-                },
-                {
-                    data: 'color',
-                    name: 'color'
-                },
-                {
-                    data: 'status',
-                    name: 'status'
-                },
-                {
-                    data: 'assigned',
-                    name: 'assigned'
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at'
-                }
-            ]
+                { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                { data: 'order_no', name: 'order_no' },
+                { data: 'customer_name', name: 'customer_name' },
+                { data: 'product_name', name: 'product_name' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'price', name: 'price' },
+                { data: 'color', name: 'color' },
+                { data: 'status', name: 'status' },
+                { data: 'assigned', name: 'assigned' },
+                { data: 'created_at', name: 'created_at'}
+            ],
+            drawCallback: function(settings) {
+                // Update total records from response
+                ordered_product_ids = settings.json.ordered_product_ids || [];
+                totalRecords = settings.json.totalRecords || 0;
+
+                // Re-apply checkbox states
+                $('.checkbox').each(function() {
+                    const id = $(this).data('order-item-id');
+                    $(this).prop('checked', selectAll || selectedIds.includes(id));
+                });
+
+                // Update selected count display
+                updateSelectedCount();
+            }
         });
 
-        $('#status, #product_id, #color, #date_from, #date_to').change(function() {
+        // Filter change handler
+        $('#status, #product_ids, #color, #date_from, #date_to').change(function() {
+            selectedIds = []; // Reset selections on filter change
+            selectAll = false;
+            $('#select_all').prop('checked', false);
             table.ajax.reload();
         });
 
-        // Enable/disable generate button based on selections
+        // $(document).on('click', '#generate_pdf', function(e) {
+        //     e.preventDefault();
+        //     if (selectedIds.length === 0 && !selectAll) {
+        //         alert('Please select at least one item or check "Select All".');
+        //         return;
+        //     }
+        //     updateSelectedItems();
+        //     $(this).closest('form').submit();
+        // });
+
+        // Enable/disable generate button and update selected count
         function updateGenerateButton() {
-            const checkedBoxes = $('.checkbox:checked').length;
+            console.log('update gen btn', selectAll)
+            const checkedBoxes = selectAll ? ordered_product_ids.length : selectedIds.length;
             $('#generate_pdf').prop('disabled', checkedBoxes === 0);
+            updateSelectedCount();
         }
 
-        // Update hidden input with selected IDs
+        // Update hidden input with selected IDs or select-all flag
         function updateSelectedItems() {
-            const selectedIds = $('.checkbox:checked').map(function() {
-                return $(this).data('order-item-id');
-            }).get();
-            $('#selected_items').val(JSON.stringify(selectedIds));
+            console.log(selectAll)
+            if (selectAll) {
+                $('#selected_items').val(JSON.stringify(ordered_product_ids)); 
+            } else {
+                $('#selected_items').val(JSON.stringify(selectedIds));
+            }
         }
 
-        // Handle checkbox changes
+        // Update selected count display
+        function updateSelectedCount() {
+            const count = selectAll ? ordered_product_ids.length : selectedIds.length;
+            // $('#selected_count').text(`Selected: ${count}`);
+        }
+
+        // Handle individual checkbox changes
         $(document).on('change', '.checkbox', function() {
+            const id = $(this).data('order-item-id');
+            if ($(this).is(':checked')) {
+                if (!selectedIds.includes(id)) {
+                    selectedIds.push(id);
+                }
+            } else {
+                selectedIds = selectedIds.filter(item => item !== id);
+                selectAll = false; // Unchecking any box disables select-all
+                $('#select_all').prop('checked', false);
+            }
+            updateSelectedItems();
+            updateGenerateButton();
+        });
+
+        // Handle select all checkbox
+        $(document).on('change', '#select_all', function() {
+            selectAll = $(this).is(':checked');
+            console.log('select all in event ', selectAll)
+            if (selectAll) {
+                selectedIds = []; // Clear individual selections
+                $('.checkbox').prop('checked', true);
+            } else {
+                $('.checkbox').prop('checked', false);
+            }
             updateSelectedItems();
             updateGenerateButton();
         });

@@ -39,7 +39,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.order.store') }}" method="post">
+<form action="{{ route('admin.order.update', $order->id) }}" method="post">
     @csrf
     <div id="customer-hide-show-toggle">
         <div class="space-y-12">
@@ -53,7 +53,7 @@
                     <div class="sm:col-span-3">
                         <label for="customer_name" class="block text-sm/6 font-medium text-gray-900">Customer Name <span class="text-red-600">*</span></label>
                         <div class="mt-2">
-                            <input type="text" required name="customer_name" id="customer_name" placeholder="Abdul Rehman" value="{{ old('customer_name') }}" autocomplete="family-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                            <input type="text" required name="customer_name"  id="customer_name" placeholder="Abdul Rehman" value="{{ $order->customer_name }}" autocomplete="family-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                             
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                     <div class="sm:col-span-3">
                         <label for="customer_email" class="block text-sm/6 font-medium text-gray-900">Customer Emai</label>
                         <div class="mt-2">
-                            <input type="text" name="customer_email" id="customer_email" value="{{ old('customer_email') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
+                            <input type="text" name="customer_email" id="customer_email" value="{{ $order->customer_email }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
                         </div>
                     </div>
     
@@ -70,7 +70,7 @@
                     <div class="sm:col-span-3">
                         <label for="customer_phone" class="block text-sm/6 font-medium text-gray-900">Customer Phone No <span class="text-red-600">*</span></label>
                         <div class="mt-2">
-                            <input type="text" required name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
+                            <input type="text" required name="customer_phone" id="customer_phone" value="{{ $order->customer_phone }}" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
                         </div>
                     </div>
 
@@ -78,18 +78,18 @@
                         <label for="status" class="block text-sm/6 font-medium text-gray-900">Order Status <span class="text-red-600">*</span></label>
                         <div class="mt-2">
                             <select name="status" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-100 sm:text-sm/6">
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="completed">Completed</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="cancelled">Cancelled</option>
+                                <option {{ $order->status == 'pending' ? 'selected' : '' }} value="pending">Pending</option>
+                                <option {{ $order->status == 'processing' ? 'selected' : '' }} value="processing">Processing</option>
+                                <option {{ $order->status == 'completed' ? 'selected' : '' }} value="completed">Completed</option>
+                                <option {{ $order->status == 'delivered' ? 'selected' : '' }} value="delivered">Delivered</option>
+                                <option {{ $order->status == 'cancelled' ? 'selected' : '' }} value="cancelled">Cancelled</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="sm:col-span-3">
                         <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                        <textarea id="description" name="description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ isset($order) ? $order->description : old('description') }}</textarea>
+                        <textarea id="description" name="description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ $order->description }}</textarea>
                     </div>
     
     
@@ -98,7 +98,7 @@
     
                     <div class="sm:col-span-3">
                         <label for="shipping_address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">shipping Adress: <span class="text-red-600">*</span></label>
-                        <textarea id="shipping_address" required name="shipping_address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ isset($order) ? $order->shipping_address : old('shipping_address') }}</textarea>
+                        <textarea id="shipping_address" required name="shipping_address" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Street, City, Country">{{ $order->shipping_address  }}</textarea>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
     </div>
 
     <div id="order-hide-show-toggle">
-        <h2 class="text-base/7 mt-6 font-semibold text-gray-900">Order Information (Order No: {{ $order_no }})</h2>
+        <h2 class="text-base/7 mt-6 font-semibold text-gray-900">Order Information (Order no: {{ $order->order_no }} )</h2>
 
         <div class="space-y-12">
             <div class="p-6 bg-white border-b border-gray-200">
@@ -161,12 +161,15 @@
 
 
 <script>
+    const orderedItems = @json($order->orderItems);
+    
     $(document).ready(function() {
         var order_items = {};
         var orderIndex = 0;
     $('#product-dropdown').select2({
         templateResult: formatProduct,
-        templateSelection: formatProductSelection
+        templateSelection: formatProductSelection,
+        placeholder: "Select a product",
     });
 
     function formatProduct(product) {
@@ -186,7 +189,7 @@
         sizes = sizes.split(',');
         return $(`
             <div class="flex items-center bg-white-100 p-2 space-x-3 select-item-option-inner">
-                <img src="${image}" class="w-10 h-10 object-cover select-item-option-image rounded">
+                <img src="${image}" data-product-id='${id}' class="w-10 h-10 object-cover select-item-option-image rounded">
                 <div class='flex flex-col' >
                     <small class="text-gray-500 ">${sku}</small>
                     <div class="font-semibold focus:text-black-900">${product.text}</div>
@@ -204,6 +207,7 @@
     // Listen for Select2 option selection
     $('#product-dropdown').on('select2:select', function(e) {
         let selectedData = e.params.data;
+        // console.log(selectedData)
         let image = $(selectedData.element).data('image');
         let sku = $(selectedData.element).data('sku');
         let desc = $(selectedData.element).data('desc');
@@ -311,12 +315,75 @@
         updateTotal();
     });
 
+    if (orderedItems && orderedItems.length > 0) {
+        console.log(orderedItems);
+        orderedItems.forEach(item => {
+            let colors = item.product.color.split(',');
+            let sizes = item.product.size.split(',');
+            let image = item.product.image;
+            let sku = item.product.sku;
+            let desc = item.product.description;
+            let id = item.product.id;
+            let price = item.price;
+            let quantity = item.quantity;
+            colors = colors.map(color => color.trim());
+            $('#items-table tbody').append(`
+            
+                <tr>
+                    <td class="px-6 py-3">
+                        <button type='button' class="remove-btn px-3 py-1 rounded hover:bg-red-700">X</button>
+                    </td>
+                    <td><img src="${image}" class="w-10 h-10 rounded"></td>
+                    <td>
+                        <small style="font-size: 11px; color: gray;">${sku}</small>
+                        <div style="font-size: 1.3rem; font-weight: bold;">${item.product.name}</div>
+                        <div style="color: gray;">${desc || ''}</div>
+                    </td>
+                    
+                    
+                    <td><input type="number" min='1' name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
+
+                    <td>
+                        <select name='items[${orderIndex}][color]' > 
+                        ${
+                            colors.map(color => {
+                                return `<option ${item.color == color ? 'selected' : ''}  value="${color}">${color}</option>`;
+                            })
+                        }
+                        </select>
+                    </td>
+
+                    <td>
+                        <select name='items[${orderIndex}][size]' > 
+                        ${
+                            sizes.map(size => {
+                                return `<option ${item.size == size ? 'selected' : ''} value="${size}">${size}</option>`;
+                            })
+                        }
+                        </select>
+                    </td>
+
+                    <td><input type="number" name="items[${orderIndex}][quantity]" class="border-0 outline-0 item-quantity" value="${quantity}" min="1" style="width: 70px;"></td>
+                    <td style="width: 200px;">
+                    <textarea name="items[${orderIndex}][description]" class="border-0 outline-0 item-description" rows="3" cols='5' style="border: 1px solid #71797E;">${item.description || ''}</textarea>
+                    </td>
+                    <td style="width: 60px;">
+                        <input type="text" class="item-subtotal" readonly name="items[${orderIndex}][subtotal]" value="${price * quantity}" style="width: 90px; display: block; margin: auto; border: 0;">
+                    </td>
+                    <input type="hidden" name="items[${orderIndex}][id]" value="${id}">
+                </tr>
+
+            `)
+            orderIndex += 1;
+            updateTotal();
+
+        });
+    }
+
 });
-// 
+
     
 
 </script>
-<script>
-    
-</script>
+
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PhpParser\Node\Expr\FuncCall;
 
 class Order extends Model
 {
@@ -34,6 +35,12 @@ class Order extends Model
         'status', // 'pending', 'processing', 'completed', 'delivered', 'cancelled'
     ];
 
+    public static function next_order_no(){
+        $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 5999;
+        $nextOrder = max((int) $lastOrder + 1, 6000);
+        return $nextOrder;
+    }
+
 
     public static function boot()
     {
@@ -41,8 +48,8 @@ class Order extends Model
         static::creating(function ($model) {
             // $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 0;
             // $model->order_no = str_pad((int) $lastOrder + 1, 5, '0', STR_PAD_LEFT); // 00001
-            $lastOrder = self::orderBy('id', 'desc')->value('order_no') ?? 5999;
-            $nextOrder = max((int) $lastOrder + 1, 6000); // Ensure at least 6000
+             // Ensure at least 6000
+            $nextOrder = self::next_order_no();
             $model->order_no = str_pad($nextOrder, 5, '0', STR_PAD_LEFT);
         });
 

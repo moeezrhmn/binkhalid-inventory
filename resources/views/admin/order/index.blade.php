@@ -30,7 +30,11 @@
         <span class="font-medium">{{ $message }}</span>
     </div>
 @enderror
-
+<style>
+    .dataTables_wrapper .dataTables_length select{
+        width: 60px;
+    }
+</style>
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-2 ">
         <div class="flex justify-between items-center mb-6">
@@ -62,6 +66,35 @@
         </div>
     </div>
 </div>
+
+
+
+
+<div id="order-details-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="overflow-y-auto hidden fixed inset-0 z-50 flex justify-center items-center w-full h-full py-10  bg-[#0000008f] bg-opacity-50" >
+    <div class="relative p-4 w-full max-w-4xl max-h-full">
+        <div class="relative bg-white rounded-lg shadow-lg dark:bg-gray-800">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Order Details</h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="order-details-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-6 space-y-4" id="order-details-content">
+                <!-- Dynamic content will be injected here -->
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button data-modal-hide="order-details-modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 
@@ -74,39 +107,17 @@
         $('#order-table').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 100,
+            lengthMenu: [10, 25, 50, 100, 200, 500],
             ajax: "{{ route('admin.order.index') }}",
-            columns: [{
-                    data: 'order_no',
-                    name: 'order_no',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'customer',
-                    name: 'customer'
-                },
-                {
-                    data: 'shipping_address',
-                    name: 'shipping_address'
-                },
-                {
-                    data: 'description',
-                    name: 'description'
-                },
-                {
-                    data: 'total',
-                    name: 'total'
-                },
-                {
-                    data: 'status',
-                    name: 'status'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }
+            columns: [
+                { data: 'order_no', name: 'order_no', searchable: true },
+                { data: 'customer', name: 'customer_name', searchable: true },
+                { data: 'shipping_address', name: 'shipping_address', searchable: true },
+                { data: 'description', name: 'description', searchable: true },
+                { data: 'total', name: 'total', searchable: false },
+                { data: 'status', name: 'status', searchable: true },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
             ],
             drawCallback: function() {
                 // Apply Tailwind classes to DataTable elements
@@ -137,6 +148,123 @@
                     }
                 });
             }
+        });
+
+
+
+        $(document).on('click', '.view-order', function(e) {
+        e.preventDefault();
+        $('#order-details-content').html('Loading...');
+        const orderId = $(this).data('id');
+        var url = `{{ route("admin.order.details", ":id") }}`.replace(':id', orderId);
+        // Fetch order details via AJAX
+        $.ajax({
+                url:url ,
+                type: 'GET',
+                success: function(response) {
+
+                    let orderDetailsHtml = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Order No:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.order_no}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Customer Name:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.customer_name}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Customer Email:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.customer_email}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Customer Phone:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.customer_phone}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Shipping Address:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.shipping_address}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Description:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.description || 'N/A'}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Subtotal:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.subtotal}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Total:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.total}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Status:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.status}</span>
+                        </div>
+                        <div>
+                            <strong class="text-gray-700 dark:text-gray-300">Created At:</strong>
+                            <span class="text-gray-900 dark:text-gray-100">${response.created_at}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Add order items table if items exist
+                if (response.order_items && response.order_items.length > 0) {
+                    orderDetailsHtml += `
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Items</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product Name</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Color/Size</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                    `;
+
+                    response.order_items.forEach(item => {
+                        orderDetailsHtml += `
+                            <tr>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">${item.product.name}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">${item.price}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">${item.quantity}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">${item.color || 'N/A'} / ${item.size || 'N/A'}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">${item.description || 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    orderDetailsHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    console.log(response)
+                    orderDetailsHtml += `
+                        <p class="text-gray-500 dark:text-gray-400">No order items found.</p>
+                    `;
+                }
+
+                // Inject HTML into modal
+                $('#order-details-content').html(orderDetailsHtml);
+
+                    // Show the modal
+                    $('#order-details-modal').removeClass('hidden');
+                },
+                error: function() {
+                    alert('Failed to load order details.');
+                }
+            });
+        });
+
+        // Close modal
+        $('[data-modal-hide="order-details-modal"]').on('click', function() {
+            $('#order-details-modal').addClass('hidden');
         });
     });
 </script>
