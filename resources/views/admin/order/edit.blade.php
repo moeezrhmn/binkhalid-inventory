@@ -221,7 +221,12 @@
 
         colors = colors.split(',');
         sizes = sizes.split(',');
-        
+        colors = colors.map(color => {
+            return color.trim();
+        });
+        sizes = sizes.map(size => {
+            return size.trim();
+        });
 
         // Append selected product to the table
         $('#items-table tbody').append(`
@@ -238,25 +243,26 @@
                 
                 
                 <td><input type="number" min='1' name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
-
                 <td>
-                    <select name='items[${orderIndex}][color]' > 
+                    <input type="text" list='color-options-${orderIndex}' name="items[${orderIndex}][color]" class="border-0 outline-0" placeholder='write color' style="width: 100px; border: 0; outline: 0;"> 
+                    <datalist id="color-options-${orderIndex}">
                     ${
                         colors.map(color => {
-                            return `<option value="${color}">${color}</option>`;
+                            return `<option value="${color}">${color} </option>`;
                         })
                     }
-                    </select>
+                    </datalist>
                 </td>
 
                 <td>
-                    <select name='items[${orderIndex}][size]' > 
+                    <input type="text" list='size-options-${orderIndex}' name="items[${orderIndex}][size]" class="border-0 outline-0" placeholder='write size' style="width: 100px; border: 0; outline: 0;"> 
+                    <datalist id="size-options-${orderIndex}">
                     ${
                         sizes.map(size => {
-                            return `<option value="${size}">${size}</option>`;
+                            return `<option value="${size}"> ${size} </option>`;
                         })
                     }
-                    </select>
+                    </datalist>
                 </td>
 
                 <td><input type="number" name="items[${orderIndex}][quantity]" class="border-0 outline-0 item-quantity" value="1" min="1" style="width: 70px;"></td>
@@ -342,25 +348,27 @@
                     
                     
                     <td><input type="number" min='1' name="items[${orderIndex}][price]" class="border-0 outline-0 item-price" value="${price}" style="width: 100px; border: 0; outline: 0;"></td>
-
+                    
                     <td>
-                        <select name='items[${orderIndex}][color]' > 
+                        <input type="text" list='color-options-${orderIndex}' name="items[${orderIndex}][color]" value='${item.color}' class="border-0 outline-0" placeholder='write color' style="width: 100px; border: 0; outline: 0;"> 
+                        <datalist id="color-options-${orderIndex}">
                         ${
                             colors.map(color => {
-                                return `<option ${item.color == color ? 'selected' : ''}  value="${color}">${color}</option>`;
+                                return `<option value="${color}">${color}</option>`;
                             })
                         }
-                        </select>
+                        </datalist>
                     </td>
 
                     <td>
-                        <select name='items[${orderIndex}][size]' > 
+                        <input type="text" list='size-options-${orderIndex}' name="items[${orderIndex}][size]" value='${item.size}'  class="border-0 outline-0" placeholder='write size' style="width: 100px; border: 0; outline: 0;"> 
+                        <datalist id="size-options-${orderIndex}">
                         ${
                             sizes.map(size => {
-                                return `<option ${item.size == size ? 'selected' : ''} value="${size}">${size}</option>`;
+                                return `<option value="${size}"> ${size}</option>`;
                             })
                         }
-                        </select>
+                        </datalist>
                     </td>
 
                     <td><input type="number" name="items[${orderIndex}][quantity]" class="border-0 outline-0 item-quantity" value="${quantity}" min="1" style="width: 70px;"></td>
