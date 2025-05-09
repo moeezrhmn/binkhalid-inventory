@@ -40,8 +40,6 @@
 <body>
     <div class="header">
         <div class="header-info">
-            <div><strong>Worker Name:</strong> {{ $worker_name }}</div>
-            <div><strong>Date:</strong> {{ $date }}</div>
         </div>
     </div>
 
@@ -62,6 +60,7 @@
                             <th>Description</th>
                             <th>Quantity</th>
                             <th>Order</th>
+                            <th>Worker</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,6 +71,7 @@
                             <td>{{ $item->description ?? 'N/A' }}</td>
                             <td>{{ $item->quantity ?? '0' }}</td>
                             <td>{{ $item->order->order_no ?? 'N/A' }}</td>
+                            <td>{{ $item->tags ?? 'N/A' }}</td>
                         </tr>
                         @endforeach
                     </tbody>

@@ -290,6 +290,10 @@ class OrderController extends Controller
     {
         if ($request->ajax()) {
             $query = OrderItem::with(['order', 'product'])
+                ->whereHas('order', function ($q) {
+                    $q->where('status', '!=', Order::STATUS_DELIVERED)
+                    ->where('status', '!=', Order::STATUS_CANCELLED);
+                })
                 ->when($request->filled('status'), function ($query) use ($request) {
                     $query->whereHas('order', function ($q) use ($request) {
                         $q->where('status', $request->status);
@@ -306,7 +310,8 @@ class OrderController extends Controller
                         $q->whereBetween('created_at', [$request->date_from, $request->date_to]);
                     });
                 });
-    
+            
+
             return DataTables::of($query)
                 ->addColumn('checkbox', function ($row) {
                     return '<input type="checkbox" class="checkbox" data-order-item-id="' . $row->id . '">';
@@ -383,8 +388,28 @@ class OrderController extends Controller
             'date' => now()->format('Y-m-d'),
             'items' => $orderItems,
         ]);
-        $pdf->setPaper([0, 0, 1500, 842 ], 'landscape');;
+        $pdf->setPaper([0, 0, 1500, 1350 ], 'landscape');;
 
         return $pdf->stream('worker-items-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    public function ordered_items_pdf(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|string'
+        ]);
+
+        $selectedIds = json_decode($request->selected_items);
+
+        $orderItems = OrderItem::with(['product', 'order'])
+            ->whereIn('id', $selectedIds)
+            ->get();
+
+        $pdf = Pdf::loadView('admin.pdf.ordered_items', [
+            'items' => $orderItems,
+        ]);
+        $pdf->setPaper([0, 0, 1500, 1350], 'landscape');;
+
+        return $pdf->stream('ordered-items-' . now()->format('Y-m-d') . '.pdf');
     }
 }

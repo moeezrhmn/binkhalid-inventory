@@ -36,6 +36,13 @@
                 </button>
             </form>
         </div>
+        <div>
+            <form class="mt-1" action="{{ route('admin.generate.ordered_items.pdf') }}" method="post">
+                @csrf
+                <input type="hidden" name="selected_items" id="ordered_selected_items">
+                <button type="submit" disabled id="gen_ordered_items_pdf" class=" py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white cursor-pointer dark:hover:bg-gray-700">Items PDF</button>
+            </form>
+        </div>
     </div>
 
 
@@ -46,8 +53,8 @@
             <select id="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option value="">All</option>
                 <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
                 <option value="completed">Completed</option>
-                <option value="canceled">Canceled</option>
             </select>
         </div>
         <div>
@@ -168,6 +175,7 @@
             console.log('update gen btn', selectAll)
             const checkedBoxes = selectAll ? ordered_product_ids.length : selectedIds.length;
             $('#generate_pdf').prop('disabled', checkedBoxes === 0);
+            $('#gen_ordered_items_pdf').prop('disabled', checkedBoxes === 0);
             updateSelectedCount();
         }
 
@@ -176,8 +184,11 @@
             console.log(selectAll)
             if (selectAll) {
                 $('#selected_items').val(JSON.stringify(ordered_product_ids)); 
+                $('#ordered_selected_items').val(JSON.stringify(ordered_product_ids)); 
+                
             } else {
                 $('#selected_items').val(JSON.stringify(selectedIds));
+                $('#ordered_selected_items').val(JSON.stringify(selectedIds)); 
             }
         }
 
